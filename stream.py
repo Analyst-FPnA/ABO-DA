@@ -1593,7 +1593,7 @@ if uploaded_file is not None:
             #combined_dataframes.append(df_all)
             final_df = pd.concat(df_concat)
             final_df['NOM'] = final_df.apply(lambda row: row['NOM'] if row['SOURCE']=='INVOICE' else row['NOM2'],axis=1)
-            if 'ID2' not in final_df.columns():
+            if 'ID2' not in final_df.columns:
                 final_df =  final_df[['CAB','DATE','TIME','CODE','ID','NOM','KAT','SOURCE','KET','HELP']]
             else:
                 final_df =  final_df[['CAB','DATE','TIME','CODE','ID','NOM','KAT','SOURCE','KET','HELP','ID2']]
