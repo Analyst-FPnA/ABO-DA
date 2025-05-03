@@ -172,11 +172,10 @@ if uploaded_file is not None:
                                                     'Gross Amount']].rename(columns={'Waktu Transaksi' : 'DATETIME',
                                                                                     'Folder' : 'CAB',
                                                                                     'Nomor Pesanan' : 'ID',
-                                                                                    'Gross Amount' : 'NOM'}).fillna('')
-          
+                                                                                    'Gross Amount' : 'NOM'}).fillna('')          
             
                 # Parse datetime column
-                df_gojek1['DATETIME']    =   pd.to_datetime(df_gojek1['DATETIME'], utc=True)
+                df_gojek1['DATETIME']    =   pd.to_datetime(df_gojek1['DATETIME'], utc=True, format="%b %d %Y, %H:%M")
             
                 df_gojek1['DATE']        =   df_gojek1['DATETIME'].dt.strftime('%d/%m/%Y')
                 df_gojek1['TIME']        =   df_gojek1['DATETIME'].dt.time
@@ -239,7 +238,8 @@ if uploaded_file is not None:
                                                                             'Nomor Pesanan' : 'ID',
                                                                             'Gross Amount' : 'NOM'}).fillna('')
                 df_gojek2['DATETIME'] = df_gojek2['DATETIME'].str.replace('T', ' ').str.slice(0, 19)
-
+                #df_gojek2['DATETIME'] = df_gojek2['DATETIME'].str.replace('Apr', 'April')
+                #df_gojek2['DATETIME'] = df_gojek2['DATETIME'].str.replace('Jun', 'June')
                 # Parse datetime column
                 df_gojek2['DATETIME']    =   pd.to_datetime(df_gojek2['DATETIME'], utc=True)
             
@@ -612,6 +612,8 @@ if uploaded_file is not None:
                 # Rename columns to match the database schema
                 df_qris = df_qris.loc[:, ['CAB', 'Transaction ID', 'DATE', 'TIME', 'Transaction Amount', 'Transaction Type']].rename(
                     columns={'Transaction ID': 'ID', 'Transaction Amount': 'NOM'}).fillna('')
+                #df_qris['DATE'] = df_qris['DATE'].str.replace('Apr', 'April')          
+                #df_qris['DATE'] = df_qris['DATE'].str.replace('Jun', 'June')
             
                 df_qris['DATE'] = pd.to_datetime(df_qris['DATE'], format='%d/%m/%Y')
                 df_qris['DATE'] = df_qris['DATE'].dt.strftime('%d/%m/%Y')
@@ -674,6 +676,8 @@ if uploaded_file is not None:
                 # Rename columns to match the database schema
                 df_qrisia = df_qrisia.loc[:, ['Folder', 'Waktu Transaksi', 'Nama Customer', 'Nominal (termasuk Tip)']].rename(
                     columns={'Folder': 'CAB', 'Waktu Transaksi': 'DATETIME', 'Nama Customer': 'ID', 'Nominal (termasuk Tip)': 'NOM'}).fillna('')
+                df_qrisia['DATETIME'] = df_qrisia['DATETIME'].str.replace('Apr', 'April')            
+                df_qrisia['DATETIME'] = df_qrisia['DATETIME'].str.replace('Jun', 'June')
             
                 # Convert 'DATETIME' column to datetime
                 df_qrisia['DATETIME'] = pd.to_datetime(df_qrisia['DATETIME'])
@@ -811,6 +815,8 @@ if uploaded_file is not None:
                 st.write("No dataframes to concatenate.")           
 
             if 'dfweb' in locals(): 
+                #dfweb['DATE'] = dfweb['DATE'].str.replace('Apr', 'April')            
+                #dfweb['DATE'] = dfweb['DATE'].str.replace('Jun', 'June')
                 
                 dfweb['SOURCE']     =   'WEB'
                 
@@ -848,8 +854,8 @@ if uploaded_file is not None:
                 dfweb['NOM'] = dfweb['NOM2'].astype(float)+dfweb['DISC'].astype(float)
                 dfweb = dfweb.drop(columns='DISC')
 
-                dfweb['KAT'] = dfweb['KAT'].replace({'SHOPEE PAY': 'SHOPEEPAY', 'SHOPEEFOOD INT': 'SHOPEEPAY','SHOPEE FOOD INT':'SHOPEEPAY','SHOPEEFOOD':'SHOPEEPAY', 'GRABFOOD INT':'GRAB FOOD',
-                                                     'GORESTO': 'GO RESTO','GOFOOD':'GO RESTO','GOFOOD INT':'GO RESTO' ,'GRAB': 'GRAB FOOD','GRAB FOOD INT':'GRAB FOOD', 'GRABFOOD':'GRAB FOOD',
+                dfweb['KAT'] = dfweb['KAT'].replace({'SHOPEE PAY': 'SHOPEEPAY', 'SHOPEEFOOD INT': 'SHOPEEPAY','SHOPEE FOOD INT':'SHOPEEPAY', 'SHOPEEFOOD': 'SHOPEEPAY', 
+                                                     'GORESTO': 'GO RESTO','GOFOOD':'GO RESTO','GOFOOD INT':'GO RESTO' ,'GRAB': 'GRAB FOOD','GRAB FOOD INT':'GRAB FOOD','GRABFOOD INT':'GRAB FOOD','GRABFOOD':'GRAB FOOD', 
                                                      'QRIS ESB ORDER':'QRIS ESB', 'EDC CIMB':'EDC'})
             
             dfinv = pd.concat(dfinv, ignore_index = True).fillna('')
@@ -964,7 +970,7 @@ if uploaded_file is not None:
                         gow = gow.sort_values(by=['CAB', 'NOM', 'TIME'], ascending=[True, True, False]).reset_index(drop=True)
                         
                         goi.drop_duplicates(inplace=True)
-                        gow['ID2'] = gow['ID'].apply(lambda x: x.split(' - ')[-1] if ' - ' in x else '')
+                        gow['ID2'] = gow['ID'].apply(lambda x: x.split(' - ')[-1] if ' - ' in str(x) else '')
                         goi['ID2'] = goi['ID']
                         if 'cn' in locals():    
                             for i in cn[(cn['TANGGAL']==str(int(re.findall(r'\d+', date)[-1]))) & (cn['CAB']==cab) & (cn['TYPE BAYAR']=='GO RESTO')].index:
